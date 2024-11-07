@@ -1,0 +1,43 @@
+# mysql-deployment.yaml
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+name: wordpress-mysql
+labels:
+  app: wordpress
+spec:
+selector:
+  matchLabels:
+    app: wordpress
+    tier: mysql
+strategy:
+  type: Recreate
+template:
+  metadata:
+    labels:
+      app: wordpress
+      tier: mysql
+  spec:
+    containers:
+    - name: mysql
+      image: docker.io/bitnami/mysql:8.0
+      env:
+      - name: MYSQL_ROOT_PASSWORD
+        value: telematicapwd
+      - name: MYSQL_DATABASE
+        value: wordpressdb
+      - name: MYSQL_USER
+        value: admin
+      - name: MYSQL_PASSWORD
+        value: telematicapwd
+      ports:
+      - containerPort: 3306
+        name: mysql
+      volumeMounts:
+      - name: mysql-persistent-storage
+        mountPath: /var/lib/mysql
+    volumes:
+    - name: mysql-persistent-storage
+      persistentVolumeClaim:
+        claimName: mysql-pvc
